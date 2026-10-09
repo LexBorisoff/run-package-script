@@ -17,7 +17,7 @@ if test -f "${paths.main}"; then
   # run the script
   if test -n "$script" && test -n "$package_manager"; then
     if test -n "$arguments"; then
-      $package_manager "$script" "$arguments"
+      $package_manager "$script" $arguments
     else
       $package_manager "$script"
     fi
