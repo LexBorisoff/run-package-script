@@ -28,7 +28,7 @@ import { logger } from './utils/logger.js';
     const script = await selectScript();
 
     if (script != null) {
-      updateTmp(script);
+      await updateTmp(script);
     }
   } catch (error) {
     if (error instanceof Error) {

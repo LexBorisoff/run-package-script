@@ -2,10 +2,18 @@ import { getPackageJson } from '../../utils/get-package-json.js';
 
 /**
  * Returns a package manager object based on
- * `packageManager` property in package.json,
- * `undefined` otherwise
+ * `devEngines` or `packageManager` property in package.json,
+ * otherwise returns `undefined`
  */
-export function getProjectPm(): string | undefined {
-  const { packageManager } = getPackageJson();
-  return packageManager?.split('@')[0];
+export function getProjectPm(): string | string[] | undefined {
+  const { devEngines = {}, packageManager: topLevelPm } = getPackageJson();
+  const { packageManager } = devEngines;
+
+  if (packageManager != null) {
+    return Array.isArray(packageManager)
+      ? packageManager.map(({ name }) => name)
+      : packageManager.name;
+  }
+
+  return topLevelPm?.split('@')[0];
 }
