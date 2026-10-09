@@ -1,5 +1,5 @@
 import { FileTree } from '@lexjs/filetree';
-import { coreActions } from '@lexjs/filetree/core';
+import { coreActions } from '@lexjs/filetree/actions';
 
 import { paths } from '../create-app/paths.js';
 import { tree } from '../create-app/tree.js';

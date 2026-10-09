@@ -7,12 +7,15 @@ import { fallbackConfig } from './fallback-config.js';
 import type { ConfigInterface } from '../types/config.types.js';
 
 export function resetConfig(key: keyof ConfigInterface): void {
-  const rootDir = useCoreActions((root) => root);
+  const [rootDir, configFile] = useCoreActions((root) => [
+    root,
+    root[CONFIG_FILE],
+  ]);
+
   if (!rootDir.exists(CONFIG_FILE)) {
-    rootDir.fileCreate(CONFIG_FILE);
+    rootDir.createFile(CONFIG_FILE);
   }
 
-  const configFile = useCoreActions((root) => root[CONFIG_FILE]);
   const configData = configFile.read();
   const config = parseData<ConfigInterface>(configData) ?? fallbackConfig;
 

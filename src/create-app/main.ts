@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import 'dotenv/config';
 
 import { createTree, FileTree } from '@lexjs/filetree';
-import { coreActions } from '@lexjs/filetree/core';
+import { coreActions } from '@lexjs/filetree/actions';
 import $_ from '@lexjs/prompts';
 import chalk from 'chalk';
 
@@ -64,7 +64,7 @@ async function initializeApp(): Promise<void> {
   const useCore = fileTree.use(coreActions);
   const rootDir = useCore((root) => root);
   if (!rootDir.exists(CONFIG_FILE)) {
-    rootDir.fileCreate(CONFIG_FILE, '');
+    rootDir.createFile(CONFIG_FILE, '');
   }
 
   // install package (link in development)
@@ -87,7 +87,7 @@ async function initializeApp(): Promise<void> {
   const rootDir = useCoreActions((root) => root);
 
   if (rootDir.exists(CONFIG_FILE)) {
-    const configData = rootDir.fileRead(CONFIG_FILE);
+    const configData = rootDir.readFile(CONFIG_FILE);
 
     if (configData != null) {
       const config = parseData<ConfigInterface>(configData);
