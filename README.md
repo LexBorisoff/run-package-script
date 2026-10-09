@@ -177,8 +177,6 @@ run check --first
 
 To pass arguments directly to the underlying script, provide them after the double-dash `--`. All arguments passed after `--` will be treated as pass-through arguments.
 
-> ⚠️ If double-dash is not working in your shell, you can also use triple-dash `---`.
-
 For example:
 
 ```json
