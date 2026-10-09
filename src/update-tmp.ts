@@ -12,6 +12,8 @@ const pmArgs = { npm, pnpm, yarn, bun };
 const [currentPm] = Object.entries(pmArgs).find(([_, pm]) => pm) ?? [];
 
 async function getPm(projectPms: string[]): Promise<string | undefined> {
+  if (projectPms.length < 2) return projectPms.at(0);
+
   // match with default package manager
   const { packageManager } = getConfigData();
   const matched = projectPms.find((manager) => manager === packageManager);

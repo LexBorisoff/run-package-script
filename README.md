@@ -3,7 +3,7 @@
 ![Build](https://img.shields.io/github/actions/workflow/status/LexBorisoff/run-package-script/release.yml)
 ![NPM Version](https://img.shields.io/npm/v/@lexjs/run)
 
-CLI to interactively select and run package scripts using any package manager.
+CLI to interactively select and run package scripts using any popular package manager.
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -14,6 +14,7 @@ CLI to interactively select and run package scripts using any package manager.
 - [Package Manager](#package-manager)
   - [Default package manager](#default-package-manager)
   - [Project's package manager](#projects-package-manager)
+  - [One-time overrides](#one-time-overrides)
 
 ## Installation
 
@@ -207,11 +208,11 @@ The CLI allows you to run scripts by using one of the following package managers
 - yarn
 - bun
 
-> 💡 Use the `--which` option to view which package manager is currently being used.
+> 💡 Use the `--which` (`-w`) option to view which package manager is currently being used.
 
 ### Default package manager
 
-To set the default package manager for all projects, provide the `--default` option with a package manager name. If no name is provided, you will be prompted to select one.
+To set the default package manager for all projects, provide the `--default` (`-d`) option with a package manager name. If no name is provided, you will be prompted to select one.
 
 For example:
 
@@ -221,14 +222,30 @@ run --default pnpm
 
 ### Project's package manager
 
-Some projects include a `packageManager` property in their `package.json`. The CLI honors it and will run scripts using this property instead of your default package manager.
+A project might specify an allow-list of package managers that it uses in a few ways in its `package.json`:
 
-You can override this behavior by supplying the package manager that you want to use as a _**flag**_. It will be applied for the _**current script run**_ only and not override the project's package manager completely.
+- a `packageManager` property inside the `devEngines` setting
+- a top-level `packageManager` property
 
-For example, if the project defines that it uses _**yarn**_, you can run a script with _**pnpm**_ as follows:
+The CLI honors both of the above ways, giving priority to `devEngines`, and will run scripts using the project's package manager instead of your default one.
+
+`devEngines.packageManager` can be either a single object or an array of objects describing a package manager. In the case where it defines an array with only 1 available package manager, the CLI acts as if `devEngines.packageManager` is defined as an object and will run scripts using that package manager. If there are 2 or more options, the CLI picks the one that matches your default package manager. And if there is no match, it prompts you to select one from the project's available options.
+
+### One-time overrides
+
+You can override your default package manager for the _**current script run**_ by supplying the package manager you want to use as a _**flag**_. This technique also works for the project's top-level `packageManager` setting. Doing this will not override your default package manager or the project's package manager completely.
+
+> ⚠️ This might fail with `devEngines.packageManager` if the package manager you're supplying is not in the allow-list.
+
+For example, if you set your default project manager as _**yarn**_, you can run a script using _**pnpm**_ as follows:
 
 ```bash
 run --pnpm [SCRIPT]
 ```
 
-> 💡 If there is no `packageManager` property in `package.json`, you can still use this pattern to override your default package manager.
+Override flags:
+
+- `-n` `--npm`
+- `-p` `--pnpm`
+- `-y` `--yarn`
+- `-b` `--bun`
