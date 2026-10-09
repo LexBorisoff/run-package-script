@@ -1,5 +1,5 @@
 import { CONFIG_FILE } from '../constants.js';
-import { useCoreHooks } from '../hooks/use-core-hooks.js';
+import { useCoreActions } from '../filetree/core-actions.js';
 
 import { getConfigData } from './get-config-data.js';
 
@@ -14,6 +14,6 @@ export function updateConfig(
   const payload = typeof config === 'function' ? config(currentConfig) : config;
   const updatedConfig: ConfigInterface = { ...currentConfig, ...payload };
 
-  const configFile = useCoreHooks((root) => root[CONFIG_FILE]);
+  const configFile = useCoreActions((root) => root[CONFIG_FILE]);
   configFile.write(JSON.stringify(updatedConfig));
 }

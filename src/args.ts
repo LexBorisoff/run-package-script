@@ -48,7 +48,9 @@ function noConflictWith(itself: Option, ...other: Option[]): Option[] {
 const parsed = yargs(hideBin(process.argv))
   .scriptName(getConfigData().command)
   .usage(`Usage: $0 [ARG...] [OPTION...]`)
-  .usage(`Interactively select and run scripts using any package manager`)
+  .usage(
+    `Interactively select and run package scripts using any package manager`,
+  )
   .option(Option.Npm, {
     type: 'boolean',
     description: desc.runWith('npm'),

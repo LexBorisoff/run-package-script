@@ -1,6 +1,6 @@
 import { CONFIG_FILE, PACKAGE_NAME } from '../constants.js';
 
-import type { TreeInterface } from 'fs-hooks';
+import type { TreeInterface } from '@lexjs/filetree';
 
 export const initialTree = {
   bin: {},

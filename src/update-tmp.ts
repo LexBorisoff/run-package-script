@@ -1,37 +1,53 @@
+import $_ from '@lexjs/prompts';
+
 import { args } from './args.js';
 import { getConfigData } from './config/get-config-data.js';
-import { useCoreHooks } from './hooks/use-core-hooks.js';
+import { useCoreActions } from './filetree/core-actions.js';
 import { getProjectPm } from './package-manager/utils/get-project-pm.js';
 import { getArgs } from './utils/get-args.js';
 
 const { passThroughArgs } = getArgs();
 const { npm, pnpm, yarn, bun } = args;
+const pmArgs = { npm, pnpm, yarn, bun };
+const [currentPm] = Object.entries(pmArgs).find(([_, pm]) => pm) ?? [];
 
-let currentPm: string | undefined = undefined;
-if (npm) {
-  currentPm = 'npm';
-} else if (pnpm) {
-  currentPm = 'pnpm';
-} else if (yarn) {
-  currentPm = 'yarn';
-} else if (bun) {
-  currentPm = 'bun';
+async function getPm(projectPms: string[]): Promise<string | undefined> {
+  if (projectPms.length < 2) return projectPms.at(0);
+
+  // match with default package manager
+  const { packageManager } = getConfigData();
+  const matched = projectPms.find((manager) => manager === packageManager);
+  if (matched != null) return matched;
+
+  // select explicitly
+  const { pm } = await $_.select({
+    choices: projectPms.map((value) => ({ title: value, value })),
+    name: 'pm',
+    message: 'Package managers allowed in this project (select one):',
+  });
+
+  return pm;
 }
 
-export function updateTmp(script: string): void {
-  // make sure tmp folder exists
-  const rootDir = useCoreHooks((root) => root);
+export async function updateTmp(script: string): Promise<void> {
+  const [rootDir, scriptFile, argsFile, pmFile] = useCoreActions((root) => {
+    const { tmp } = root;
+    return [root, tmp.script, tmp.arguments, tmp['package-manager']];
+  });
+
+  // ensure tmp folder exists
   if (!rootDir.exists('tmp')) {
-    rootDir.dirCreate('tmp');
+    rootDir.createDir('tmp');
   }
 
-  const scriptFile = useCoreHooks(({ tmp }) => tmp.script);
-  const argumentsFile = useCoreHooks(({ tmp }) => tmp.arguments);
-  const pmFile = useCoreHooks((root) => root.tmp['package-manager']);
+  const pmRaw = currentPm ?? getProjectPm() ?? getConfigData().packageManager;
+  const pm = typeof pmRaw === 'string' ? pmRaw : await getPm(pmRaw);
 
-  const pm = currentPm ?? getProjectPm() ?? getConfigData().packageManager;
+  if (pm == null) {
+    return;
+  }
 
   scriptFile.write(script);
-  argumentsFile.write(passThroughArgs.join(' '));
+  argsFile.write(passThroughArgs.join(' '));
   pmFile.write(`${pm} run`);
 }

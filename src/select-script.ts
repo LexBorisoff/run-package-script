@@ -93,6 +93,7 @@ export async function selectScript(): Promise<string | undefined> {
   const { script } = await $_.autocomplete({
     name: 'script',
     message: 'Type to find a script',
+    clearFirst: true,
     choices: packageScripts,
     suggest(input: string | number, list) {
       const inputStr = `${input}`;

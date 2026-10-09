@@ -1,20 +1,23 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { FsHooks } from 'fs-hooks';
+import { FileTree } from '@lexjs/filetree';
 
-import { IS_WINDOWS } from '../constants.js';
-import { permissionsHooks } from '../hooks/permissions.hooks.js';
-import { tree } from '../hooks/tree.js';
-import { useCoreHooks } from '../hooks/use-core-hooks.js';
-import { paths } from '../paths.js';
+import { IS_WINDOWS, BASH_START_FILE } from '../constants.js';
+import { useCoreActions } from '../filetree/core-actions.js';
+import { permissionActions } from '../filetree/permission-actions.js';
 
-import { getScriptNames } from './get-script-names.js';
-import { bashScript, powershellScript } from './script-contents.js';
+import { paths } from './paths.js';
+import {
+  bashScript,
+  bashStartScript,
+  powershellScript,
+} from './script-contents.js';
+import { tree } from './tree.js';
 
 export async function createScriptFiles(command: string): Promise<void> {
-  const binDir = useCoreHooks((root) => root.bin);
-  const scriptNames = getScriptNames(command);
+  const [rootDir, binDir] = useCoreActions((root) => [root, root.bin]);
+  const scriptNames = { bash: command, powershell: `${command}.ps1` };
   const { bash, powershell } = scriptNames;
 
   // delete files that are not named based on the command
@@ -26,19 +29,20 @@ export async function createScriptFiles(command: string): Promise<void> {
       return fs.statSync(filePath).isFile() && !isCommandFile;
     })
     .forEach((file) => {
-      binDir.fileDelete(file);
+      binDir.deleteFile(file);
     });
 
-  const fsHooks = new FsHooks(paths.root, tree);
-  const usePermissions = fsHooks.useHooks(permissionsHooks);
+  const fileTree = new FileTree(paths.root, tree);
+  const usePermissions = fileTree.use(permissionActions);
   const binPermissions = usePermissions(({ bin }) => bin);
 
   // create scripts files
-  binDir.fileCreate(bash, bashScript);
+  rootDir.createFile(BASH_START_FILE, bashStartScript);
+  binDir.createFile(bash, bashScript);
   await binPermissions.x(bash);
 
   if (IS_WINDOWS) {
-    binDir.fileCreate(powershell, powershellScript);
+    binDir.createFile(powershell, powershellScript);
     await binPermissions.x(powershell);
   }
 }

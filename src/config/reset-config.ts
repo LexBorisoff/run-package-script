@@ -1,5 +1,5 @@
 import { CONFIG_FILE } from '../constants.js';
-import { useCoreHooks } from '../hooks/use-core-hooks.js';
+import { useCoreActions } from '../filetree/core-actions.js';
 import { parseData } from '../utils/parse-data.js';
 
 import { fallbackConfig } from './fallback-config.js';
@@ -7,12 +7,15 @@ import { fallbackConfig } from './fallback-config.js';
 import type { ConfigInterface } from '../types/config.types.js';
 
 export function resetConfig(key: keyof ConfigInterface): void {
-  const rootDir = useCoreHooks((root) => root);
+  const [rootDir, configFile] = useCoreActions((root) => [
+    root,
+    root[CONFIG_FILE],
+  ]);
+
   if (!rootDir.exists(CONFIG_FILE)) {
-    rootDir.fileCreate(CONFIG_FILE);
+    rootDir.createFile(CONFIG_FILE);
   }
 
-  const configFile = useCoreHooks((root) => root['config.json']);
   const configData = configFile.read();
   const config = parseData<ConfigInterface>(configData) ?? fallbackConfig;
 

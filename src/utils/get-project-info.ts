@@ -10,5 +10,5 @@ export function getProjectInfo(): PackageJson {
   const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
   const root = path.join(__dirname, '../../');
   const json = fs.readFileSync(path.resolve(`${root}/package.json`), 'utf-8');
-  return parseData<PackageJson>(json)!;
+  return parseData<PackageJson>(json) ?? {};
 }

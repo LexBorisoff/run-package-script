@@ -1,5 +1,5 @@
 {
-  "name": "package-scripts",
+  "name": "@lexjs/run",
   "version": "0.0.0-semantically-released",
   "description": "CLI to interactively select and run package scripts using any package manager",
   "type": "module",
@@ -26,7 +26,7 @@
     "dist"
   ],
   "bin": {
-    "create-package-scripts": "dist/create-app/index.js"
+    "create-lexjs-run": "dist/create-app/main.js"
   },
   "keywords": [
     "package",
@@ -36,25 +36,37 @@
     "package-manager",
     "npm",
     "pnpm",
-    "yarn"
+    "yarn",
+    "bun",
+    "tools",
+    "DX"
   ],
   "author": "Lex Borisoff <lex@boriosoff.dev>",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LexBorisoff/package-scripts.git"
+    "url": "git+https://github.com/LexBorisoff/run-package-script.git"
   },
-  "homepage": "https://github.com/LexBorisoff/package-scripts/tree/main#readme",
+  "homepage": "https://github.com/LexBorisoff/run-package-script/tree/main#readme",
   "bugs": {
-    "url": "https://github.com/LexBorisoff/package-scripts/issues"
+    "url": "https://github.com/LexBorisoff/run-package-script/issues"
   },
   "engines": {
     "node": ">=18"
   },
+  "dependencies": {
+    "@lexjs/filetree": "^3.0.0",
+    "@lexjs/prompts": "^1.2.1",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.4.7",
+    "execa": "^9.5.2",
+    "type-fest": "^5.8.0",
+    "yargs": "^17.7.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
-    "@lexjs/eslint-plugin": "^1.1.2",
+    "@lexjs/eslint": "^2.0.0",
     "@types/node": "^22.10.6",
     "@types/yargs": "^17.0.33",
     "conventional-changelog-conventionalcommits": "^8.0.0",
@@ -63,16 +75,6 @@
     "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
     "semantic-release": "^25.0.3",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
-  },
-  "dependencies": {
-    "@lexjs/prompts": "^1.1.3",
-    "chalk": "^4.1.2",
-    "dotenv": "^16.4.7",
-    "execa": "^9.5.2",
-    "fs-hooks": "^1.1.2",
-    "type-fest": "^4.32.0",
-    "yargs": "^17.7.2"
+    "typescript": "^5.9.3"
   }
 }

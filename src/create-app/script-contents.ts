@@ -1,4 +1,4 @@
-import { paths } from '../paths.js';
+import { paths } from './paths.js';
 
 export const bashScript = `#!/usr/bin/env bash
 
@@ -17,7 +17,7 @@ if test -f "${paths.main}"; then
   # run the script
   if test -n "$script" && test -n "$package_manager"; then
     if test -n "$arguments"; then
-      $package_manager "$script" "$arguments"
+      $package_manager "$script" $arguments
     else
       $package_manager "$script"
     fi
@@ -28,6 +28,12 @@ if test -f "${paths.main}"; then
   unset package_manager
 fi
 `;
+
+export const bashStartScript = `#!/usr/bin/env bash
+
+if test -d "${paths.bin}"; then
+	export PATH=${paths.bin}:$PATH
+fi`;
 
 export const powershellScript = `#!/usr/bin/env pwsh
 

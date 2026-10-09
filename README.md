@@ -1,9 +1,9 @@
-# `package-scripts`
+# `@lexjs/run`
 
-![Build](https://img.shields.io/github/actions/workflow/status/LexBorisoff/package-scripts/release.yml)
-![NPM Version](https://img.shields.io/npm/v/package-scripts)
+![Build](https://img.shields.io/github/actions/workflow/status/LexBorisoff/run-package-script/release.yml)
+![NPM Version](https://img.shields.io/npm/v/@lexjs/run)
 
-CLI to interactively select and run package scripts using a package manager of your choice.
+CLI to interactively select and run package scripts using any popular package manager.
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -14,13 +14,26 @@ CLI to interactively select and run package scripts using a package manager of y
 - [Package Manager](#package-manager)
   - [Default package manager](#default-package-manager)
   - [Project's package manager](#projects-package-manager)
+  - [One-time overrides](#one-time-overrides)
 
 ## Installation
 
-**Step 1**. Run the following command using **_npx_** from any directory.
+**Step 1**. Run one of the following commands from any directory.
 
 ```bash
-npx package-scripts
+npx @lexjs/run
+```
+
+```bash
+pnpm dlx @lexjs/run
+```
+
+```bash
+yarn dlx @lexjs/run
+```
+
+```bash
+bunx @lexjs/run
 ```
 
 **Step 2**. Follow the prompts to set up the command name and select your default package manager.
@@ -32,9 +45,7 @@ npx package-scripts
 ```bash
 # ~/.bashrc or ~/.zshrc
 
-if test -d ~/.package-scripts/bin; then
-  export PATH=~/.package-scripts/bin:$PATH
-fi
+test -f ~/.lexjs/run/start.sh && . ~/.lexjs/run/start.sh
 ```
 
 - For PowerShell
@@ -42,8 +53,8 @@ fi
 ```powershell
 # C:\Program Files\PowerShell\7\profile.ps1
 
-if (Test-Path -Path "$env:HOMEPATH\.package-scripts\bin") {
-  $env:Path = "$env:HOMEPATH\.package-scripts\bin;$env:Path"
+if (Test-Path -Path "$env:HOMEPATH\.lexjs\run\bin") {
+  $env:Path = "$env:HOMEPATH\.lexjs\run\bin;$env:Path"
 }
 ```
 
@@ -53,17 +64,17 @@ if (Test-Path -Path "$env:HOMEPATH\.package-scripts\bin") {
 
 ### How it works
 
-The installation process creates a `~/.package-scripts` directory where it installs the **_core library_** and creates a **_shell script_** that acts as the program's main entry point. The script's directory (`bin`) is added to your PATH, making the script accessible from anywhere in your shell. By giving the script a name that you prefer (or sticking to the default), you control how to invoke the program.
+The installation process creates a `~/.lexjs/run` directory where it installs the **_core library_** and creates a **_shell script_** that acts as the program's main entry point. The script's directory (`bin`) is added to your PATH, making the script accessible from anywhere in your shell. By giving the script a name that you prefer (or sticking to the default), you control how to invoke the program.
 
 ### Renaming the command
 
 You can rename the command later by providing the `--rename` option with the new command name. If the name is not provided, you will be prompted to enter one.
 
 ```bash
-scripts --rename <new-name>
+run --rename <new-name>
 ```
 
-> 📚 All following examples will assume the command name is `scripts`
+> 📚 All following examples will assume the command name is `run`
 
 ## Usage
 
@@ -72,30 +83,30 @@ To interactively select and run a script in your current project, run the comman
 For example:
 
 ```bash
-scripts
+run
 ```
 
 ```json
 {
   "scripts": {
     "prepack": "npm run build",
-    "build": "npm run compile",
     "prebuild": "npm run ci && rimraf ./dist",
-    "ci": "npm run check-style && npm run check-build",
-    "check-style": "npm run format:check && npm run lint",
-    "check-build": "npm run compile -- --noEmit",
+    "build": "npm run compile",
+    "ci": "npm run check:style && npm run check:build",
+    "check:style": "npm run check:format && npm run check:lint",
+    "check:build": "npm run compile -- --noEmit",
+    "check:format": "prettier --check \"*.{js,cjs,mjs,ts,cts,mts}\" \"{src,test}/**/*.ts\"",
+    "check:lint": "eslint \"{src,test}/**/*.{js,ts}\"",
+    "style": "npm run format && npm run lint",
     "format": "prettier --write \"*.{js,cjs,mjs,ts,cts,mts}\" \"{src,test}/**/*.ts\"",
-    "format:check": "prettier --check \"*.{js,cjs,mjs,ts,cts,mts}\" \"{src,test}/**/*.ts\"",
-    "lint": "eslint \"{src,test}/**/*.{js,ts}\"",
-    "lint:fix": "npm run lint -- --fix",
-    "style": "npm run format && npm run lint:fix",
+    "lint": "npm run check:lint -- --fix",
     "compile": "tsc -p tsconfig.json",
     "prepare": "husky"
   }
 }
 ```
 
-<img src="https://github.com/LexBorisoff/package-scripts/blob/main/media/usage.gif?raw=true" alt="usage example" width="1000" />
+<img src="https://github.com/LexBorisoff/run-package-script/blob/main/media/usage.gif?raw=true" alt="usage example" width="1000" />
 
 ### Arguments
 
@@ -104,7 +115,7 @@ Supplying command arguments will filter the initial list of displayed scripts. H
 For example:
 
 ```bash
-scripts arg1 arg2 ...
+run arg1 arg2 ...
 ```
 
 ### Bypassing the selection prompt
@@ -114,7 +125,7 @@ There are cases when the CLI will run a matched script without displaying the se
 - When a single argument is provided that matches a script **_exactly_** even if there are other scripts containing that argument in their names.
 - When a single script is matched based on the provided arguments.
 
-> 💡 The `--interactive` option can override this behavior and show the interactive selection menu.
+> 💡 The `--interactive` (`-i`) option can override this behavior and show the interactive selection menu.
 
 For example:
 
@@ -129,13 +140,13 @@ For example:
 ```
 
 ```bash
-scripts build
+run build
 ```
 
 > 👆 runs the `build` script (exact match)
 
 ```bash
-scripts build check
+run build check
 ```
 
 > 👆 runs the `check-build` script
@@ -157,7 +168,7 @@ For example:
 ```
 
 ```bash
-scripts check --first
+run check --first
 ```
 
 > 👆 runs the `check-style` script
@@ -165,8 +176,6 @@ scripts check --first
 ### Pass-through arguments
 
 To pass arguments directly to the underlying script, provide them after the double-dash `--`. All arguments passed after `--` will be treated as pass-through arguments.
-
-> ⚠️ If double-dash is not working in your shell, you can also use triple-dash `---`.
 
 For example:
 
@@ -179,14 +188,14 @@ For example:
 ```
 
 ```bash
-scripts hello -- world
+run hello -- world
 ```
 
-<img src="https://github.com/LexBorisoff/package-scripts/blob/main/media/hello-world-1.gif?raw=true" alt="usage example" width="1000" />
+<img src="https://github.com/LexBorisoff/run-package-script/blob/main/media/hello-world-1.gif?raw=true" alt="usage example" width="1000" />
 
 Passing arguments to the script also works with the selection prompt:
 
-<img src="https://github.com/LexBorisoff/package-scripts/blob/main/media/hello-world-2.gif?raw=true" alt="usage example" width="1000" />
+<img src="https://github.com/LexBorisoff/run-package-script/blob/main/media/hello-world-2.gif?raw=true" alt="usage example" width="1000" />
 
 ## Package Manager
 
@@ -197,28 +206,44 @@ The CLI allows you to run scripts by using one of the following package managers
 - yarn
 - bun
 
-> 💡 Use the `--which` option to view which package manager is currently being used.
+> 💡 Use the `--which` (`-w`) option to view which package manager is currently being used.
 
 ### Default package manager
 
-To set the default package manager for all projects, provide the `--default` option with a package manager name. If no name is provided, you will be prompted to select one.
+To set the default package manager for all projects, provide the `--default` (`-d`) option with a package manager name. If no name is provided, you will be prompted to select one.
 
 For example:
 
 ```bash
-scripts --default pnpm
+run --default pnpm
 ```
 
 ### Project's package manager
 
-Some projects include a `packageManager` property in their `package.json`. The CLI honors it and will run scripts using this property instead of your default package manager.
+A project might specify an allow-list of package managers that it uses in a few ways in its `package.json`:
 
-You can override this behavior by supplying the package manager that you want to use as a _**flag**_. It will be applied for the _**current script run**_ only and not override the project's package manager completely.
+- a `packageManager` property inside the `devEngines` setting
+- a top-level `packageManager` property
 
-For example, if the project defines that it uses _**yarn**_, you can run a script with _**pnpm**_ as follows:
+The CLI honors both of the above ways, giving priority to `devEngines`, and will run scripts using the project's package manager instead of your default one.
+
+`devEngines.packageManager` can be either a single object or an array of objects describing a package manager. In the case where it defines an array with only 1 available package manager, the CLI acts as if `devEngines.packageManager` is defined as an object and will run scripts using that package manager. If there are 2 or more options, the CLI picks the one that matches your default package manager. And if there is no match, it prompts you to select one from the project's available options.
+
+### One-time overrides
+
+You can override your default package manager for the _**current script run**_ by supplying the package manager you want to use as a _**flag**_. This technique also works for the project's top-level `packageManager` setting. Doing this will not override your default package manager or the project's package manager completely.
+
+> ⚠️ This might fail with `devEngines.packageManager` if the package manager you're supplying is not in the allow-list.
+
+For example, if you set your default project manager as _**yarn**_, you can run a script using _**pnpm**_ as follows:
 
 ```bash
-scripts --pnpm [SCRIPT]
+run --pnpm [SCRIPT]
 ```
 
-> 💡 If there is no `packageManager` property in `package.json`, you can still use this pattern to override your default package manager.
+Override flags:
+
+- `-n` `--npm`
+- `-p` `--pnpm`
+- `-y` `--yarn`
+- `-b` `--bun`
