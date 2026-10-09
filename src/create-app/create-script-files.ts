@@ -16,8 +16,7 @@ import {
 import { tree } from './tree.js';
 
 export async function createScriptFiles(command: string): Promise<void> {
-  const rootDir = useCoreActions((root) => root);
-  const binDir = useCoreActions((root) => root.bin);
+  const [rootDir, binDir] = useCoreActions((root) => [root, root.bin]);
   const scriptNames = { bash: command, powershell: `${command}.ps1` };
   const { bash, powershell } = scriptNames;
 
@@ -30,7 +29,7 @@ export async function createScriptFiles(command: string): Promise<void> {
       return fs.statSync(filePath).isFile() && !isCommandFile;
     })
     .forEach((file) => {
-      binDir.fileDelete(file);
+      binDir.deleteFile(file);
     });
 
   const fileTree = new FileTree(paths.root, tree);
@@ -38,12 +37,12 @@ export async function createScriptFiles(command: string): Promise<void> {
   const binPermissions = usePermissions(({ bin }) => bin);
 
   // create scripts files
-  rootDir.fileCreate(BASH_START_FILE, bashStartScript);
-  binDir.fileCreate(bash, bashScript);
+  rootDir.createFile(BASH_START_FILE, bashStartScript);
+  binDir.createFile(bash, bashScript);
   await binPermissions.x(bash);
 
   if (IS_WINDOWS) {
-    binDir.fileCreate(powershell, powershellScript);
+    binDir.createFile(powershell, powershellScript);
     await binPermissions.x(powershell);
   }
 }

@@ -55,12 +55,12 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@lexjs/filetree": "^2.0.0",
+    "@lexjs/filetree": "^3.0.0",
     "@lexjs/prompts": "^1.2.1",
     "chalk": "^4.1.2",
     "dotenv": "^16.4.7",
     "execa": "^9.5.2",
-    "type-fest": "^4.32.0",
+    "type-fest": "^5.8.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
